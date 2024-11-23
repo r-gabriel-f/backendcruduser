@@ -1,20 +1,18 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    },
-    max: 20, // máximo número de clientes en el pool
-    idleTimeoutMillis: 30000, // tiempo máximo que un cliente puede estar inactivo en el pool
-    connectionTimeoutMillis: 2000, // tiempo máximo para establecer una nueva conexión
+  user: process.env.USER,
+  host: process.env.HOST,         
+  database: process.env.DATABASE,
+  password: process.env.PASSWORD, 
+  port: process.env.PORT,           
+});
+pool.connect((err, client, release) => {
+  if (err) {
+    return console.error('Error al conectar a la base de datos:', err.stack);
+  }
+  console.log('Conexión exitosa a PostgreSQL');
+  release();
 });
 
-pool.on('error', (err, client) => {
-    console.error('Error inesperado en el cliente inactivo', err);
-});
-
-module.exports = {
-    query: (text, params) => pool.query(text, params),
-    getClient: () => pool.connect(),
-};
+module.exports = pool;
